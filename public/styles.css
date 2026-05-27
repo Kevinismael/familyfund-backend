@@ -1,0 +1,297 @@
+body {
+  margin: 0;
+  background: #0d0d0d;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+/* Auth */
+.auth-container {
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.auth-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.auth-tabs button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  background: #333;
+  color: #fff;
+}
+
+.auth-tabs button.active {
+  background: #1e90ff;
+}
+
+.auth-form input {
+  width: 90%;
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: 5px;
+  border: none;
+}
+
+.auth-form button {
+  width: 95%;
+  margin-top: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.error-text {
+  color: #ff4d4d;
+  font-size: 0.85rem;
+  margin-top: 5px;
+}
+
+/* App */
+.family-label {
+  margin-top: 5px;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.logout-btn {
+  background: #e74c3c;
+  float: right;
+  margin-top: -30px;
+}
+
+/* Tanque */
+.tank-container {
+  width: 100%;
+  margin: 20px 0;
+}
+
+.tank-glass {
+  width: 100%;
+  height: 40px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 25px;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.25);
+  box-shadow: 0 0 12px rgba(255,255,255,0.25);
+}
+
+#tank-water {
+  height: 100%;
+  width: 0%;
+  background: #1e90ff;
+  transition: width 0.8s ease, background 0.5s ease;
+}
+
+.tank-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.25),
+    rgba(255,255,255,0)
+  );
+  animation: shineMove 3s infinite linear;
+}
+
+@keyframes shineMove {
+  from { left: -100%; }
+  to { left: 120%; }
+}
+
+/* Info */
+.info p {
+  margin: 5px 0;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+}
+
+/* Botones e inputs */
+button {
+  padding: 10px;
+  margin-top: 10px;
+  background: #1e90ff;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+input {
+  padding: 10px;
+  width: 90%;
+  margin-top: 10px;
+  border-radius: 5px;
+  border: none;
+}
+
+.buttons-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-income {
+  background: #2ecc71;
+}
+
+.btn-expense {
+  background: #e74c3c;
+}
+
+/* Lista */
+ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+li {
+  background: #1a1a1a;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+li.negative {
+  color: #ff4d4d;
+}
+
+li.positive {
+  color: #2ecc71;
+}
+
+/* Gráfico */
+.chart-container {
+  margin-top: 30px;
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+/* Ahorro general */
+.savings-container {
+  margin-top: 25px;
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.savings-container h2 {
+  margin-top: 0;
+  text-align: center;
+}
+
+.savings-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.savings-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+.savings-field label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.savings-field input {
+  width: 100%;
+}
+
+/* Cajas de ahorro */
+.savings-boxes {
+  margin-top: 25px;
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.savings-boxes h2 {
+  text-align: center;
+}
+
+.box-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.box-form input {
+  flex: 1;
+  min-width: 150px;
+}
+
+#boxesList {
+  list-style: none;
+  margin-top: 15px;
+  padding: 0;
+}
+
+.box-item {
+  background: #111;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.box-item span {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.box-item button {
+  background: #e74c3c;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
