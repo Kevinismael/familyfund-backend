@@ -44,7 +44,6 @@ router.post('/', (req, res) => {
   all.push(movement);
   write(all);
 
-  // Emitir actualización en tiempo real
   const emitUserUpdate = req.app.get('emitUserUpdate');
   emitUserUpdate && emitUserUpdate(req.userId);
 

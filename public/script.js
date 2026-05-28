@@ -1,4 +1,5 @@
-const API_BASE = 'http://localhost:3000/api';
+// API base (misma origin)
+const API_BASE = '/api';
 const API_AUTH = `${API_BASE}/auth`;
 const API_MOV = `${API_BASE}/movements`;
 const API_SET = `${API_BASE}/settings`;
@@ -61,7 +62,7 @@ const boxesList = document.getElementById('boxesList');
 const descInput = document.getElementById('description');
 const amountInput = document.getElementById('amount');
 
-// Helpers sesión
+// Sesión
 function saveSession(t, user) {
   token = t;
   currentUser = user;
@@ -170,12 +171,12 @@ btnLogout.onclick = () => {
   authContainer.classList.remove('hidden');
 };
 
-// Conectar Socket.IO
+// Socket.IO (misma origin)
 function connectSocket() {
   if (!token) return;
   if (socket) socket.disconnect();
 
-  socket = io('http://localhost:3000', {
+  socket = io({
     auth: { token }
   });
 
@@ -187,7 +188,6 @@ function connectSocket() {
     console.log('Socket desconectado');
   });
 
-  // Cuando el backend emite dataUpdated, recargamos datos
   socket.on('dataUpdated', async () => {
     console.log('Actualización en tiempo real recibida');
     await reloadAllData();
@@ -290,23 +290,61 @@ function renderBoxes() {
     const li = document.createElement('li');
     li.className = 'box-item';
 
-    const title = document.createElement('span');
-    title.textContent = box.name;
+    const header = document.createElement('div');
+    header.className = 'box-header';
 
-    const details = document.createElement('span');
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'box-name';
+    nameSpan.textContent = box.name;
+
+    const balanceSpan = document.createElement('span');
+    balanceSpan.className = 'box-balance';
+    balanceSpan.textContent = `Saldo caja: € ${ (box.balance || 0).toFixed(2) }`;
+
+    header.appendChild(nameSpan);
+    header.appendChild(balanceSpan);
+
+    const details = document.createElement('div');
     details.textContent =
-      `Auto: ${box.percent}% — Manual: € ${box.manual.toFixed(2)}`;
+      `Auto: ${box.percent}% — Manual fijo: € ${ (box.manual || 0).toFixed(2) }`;
+
+    const controls = document.createElement('div');
+    controls.className = 'box-controls';
+
+    const inputAdd = document.createElement('input');
+    inputAdd.type = 'number';
+    inputAdd.step = '0.01';
+    inputAdd.min = '0';
+    inputAdd.placeholder = 'Agregar (€)';
+
+    const btnAdd = document.createElement('button');
+    btnAdd.className = 'btn-add-balance';
+    btnAdd.textContent = 'Sumar a caja';
+    btnAdd.onclick = async () => {
+      const amount = parseFloat(inputAdd.value);
+      if (!amount || amount <= 0) return;
+      await authFetch(`${API_SAV}/${box.id}/add`, {
+        method: 'POST',
+        body: JSON.stringify({ amount })
+      });
+      inputAdd.value = '';
+    };
 
     const btnDelete = document.createElement('button');
+    btnDelete.className = 'btn-delete-box';
     btnDelete.textContent = 'Eliminar';
     btnDelete.onclick = async () => {
       await authFetch(`${API_SAV}/${box.id}`, { method: 'DELETE' });
-      // El backend emitirá dataUpdated y se recargará solo
     };
 
-    li.appendChild(title);
+    controls.appendChild(inputAdd);
+    controls.appendChild(btnAdd);
+    controls.appendChild(btnDelete);
+
+    li.appendChild(header);
     li.appendChild(details);
-    li.appendChild(btnDelete);
+    li.appendChild(controls);
+
     boxesList.appendChild(li);
   });
 }
@@ -326,7 +364,6 @@ document.getElementById('addBox').onclick = async () => {
   boxNameInput.value = '';
   boxPercentInput.value = '';
   boxManualInput.value = '';
-  // El backend emitirá dataUpdated y se recargará solo
 };
 
 // Movimientos
@@ -371,12 +408,15 @@ function recalc() {
 
   let autoBoxes = 0;
   let manualBoxes = 0;
+  let balanceBoxes = 0;
+
   savingsBoxes.forEach(box => {
     autoBoxes += totalIncomeYear * (box.percent / 100);
-    manualBoxes += box.manual;
+    manualBoxes += box.manual || 0;
+    balanceBoxes += box.balance || 0;
   });
 
-  const totalSavings = totalGeneral + autoBoxes + manualBoxes;
+  const totalSavings = totalGeneral + autoBoxes + manualBoxes + balanceBoxes;
 
   let savingsPercentOfIncome = 0;
   if (totalIncomeYear > 0) {
@@ -419,7 +459,7 @@ function updateTank() {
   } else if (saldoActual < 1000) {
     tankWater.style.background = '#ffcc00';
   } else {
-    tankWater.style.background = '#1e90ff';
+    tankWater.style.background = '#22c55e';
   }
 }
 
@@ -504,7 +544,6 @@ async function handleMovement(type) {
 
   descInput.value = '';
   amountInput.value = '';
-  // El backend emitirá dataUpdated y se recargará solo
 }
 
 // Botón ajustes

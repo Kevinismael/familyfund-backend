@@ -36,7 +36,7 @@ router.get('/', (req, res) => {
   res.json(s.savingsBoxes || []);
 });
 
-// Crear caja
+// Crear caja nueva
 router.post('/', (req, res) => {
   const { name, percent, manual } = req.body;
   if (!name) return res.status(400).json({ error: 'Nombre requerido' });
@@ -48,7 +48,8 @@ router.post('/', (req, res) => {
     id: Date.now(),
     name,
     percent: parseFloat(percent) || 0,
-    manual: parseFloat(manual) || 0
+    manual: parseFloat(manual) || 0,
+    balance: 0
   };
 
   s.savingsBoxes.push(newBox);
@@ -83,7 +84,33 @@ router.put('/:id', (req, res) => {
   res.json(box);
 });
 
-// Borrar caja
+// Agregar dinero manual a la caja (acumular)
+router.post('/:id/add', (req, res) => {
+  const id = parseInt(req.params.id);
+  const { amount } = req.body;
+
+  const parsed = parseFloat(amount);
+  if (isNaN(parsed) || parsed <= 0) {
+    return res.status(400).json({ error: 'Monto inválido' });
+  }
+
+  const all = read();
+  const s = getUserSettings(all, req.userId);
+
+  const box = s.savingsBoxes.find(b => b.id === id);
+  if (!box) return res.status(404).json({ error: 'Caja no encontrada' });
+
+  box.balance += parsed;
+
+  write(all);
+
+  const emitUserUpdate = req.app.get('emitUserUpdate');
+  emitUserUpdate && emitUserUpdate(req.userId);
+
+  res.json(box);
+});
+
+// Eliminar caja
 router.delete('/:id', (req, res) => {
   const id = parseInt(req.params.id);
 

@@ -3,18 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FamilyFund Premium</title>
+  <title>FamilyFund</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Cliente de Socket.IO -->
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-
   <div class="container">
     <h1>FamilyFund</h1>
 
-    <!-- Auth -->
+    <!-- AUTENTICACIÓN -->
     <div class="auth-container" id="authContainer">
       <h2>Acceso familiar</h2>
       <div class="auth-tabs">
@@ -38,11 +36,14 @@
       </div>
     </div>
 
-    <!-- App -->
+    <!-- APP -->
     <div id="appContainer" class="hidden">
-      <p id="familyLabel" class="family-label"></p>
-      <button id="btnLogout" class="logout-btn">Cerrar sesión</button>
+      <div class="top-bar">
+        <p id="familyLabel" class="family-label"></p>
+        <button id="btnLogout" class="logout-btn">Cerrar sesión</button>
+      </div>
 
+      <!-- TANQUE -->
       <div class="tank-container">
         <div class="tank-glass">
           <div id="tank-water"></div>
@@ -50,6 +51,7 @@
         </div>
       </div>
 
+      <!-- INFO GENERAL -->
       <div class="info">
         <p id="saldoText">Saldo actual: € 0</p>
         <p id="capacidadText">Capacidad máxima: —</p>
@@ -58,6 +60,7 @@
         <button id="btnAjustes">⚙ Ajustar capacidad</button>
       </div>
 
+      <!-- MOVIMIENTOS -->
       <form id="movementForm">
         <input type="text" id="description" placeholder="Descripción" required>
         <input type="number" id="amount" step="0.01" placeholder="Monto (€)" required>
@@ -69,11 +72,13 @@
 
       <ul id="movementList"></ul>
 
+      <!-- GRÁFICO -->
       <div class="chart-container">
         <h2>Resumen anual</h2>
         <canvas id="yearChart"></canvas>
       </div>
 
+      <!-- AHORRO GENERAL -->
       <div class="savings-container">
         <h2>Ahorro general</h2>
         <p id="savingsSummary">Ahorro total: € 0 (0% del total ingresado)</p>
@@ -90,6 +95,7 @@
         <button id="saveSavings">Actualizar ahorro</button>
       </div>
 
+      <!-- CAJAS DE AHORRO -->
       <div class="savings-boxes">
         <h2>Cajas de ahorro</h2>
 
@@ -105,6 +111,7 @@
     </div>
   </div>
 
+  <!-- MODAL CAPACIDAD -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <h2>Configurar capacidad máxima</h2>

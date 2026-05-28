@@ -6,7 +6,6 @@ const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 const FILE = path.join(__dirname, '..', 'data', 'users.json');
-const SECRET = 'familyfund_super_secreto';
 
 function readUsers() {
   if (!fs.existsSync(FILE)) fs.writeFileSync(FILE, '[]');
@@ -15,6 +14,10 @@ function readUsers() {
 
 function writeUsers(data) {
   fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
+}
+
+function getSecret(req) {
+  return req.app.get('jwtSecret') || 'familyfund_super_secreto';
 }
 
 // Registro
@@ -41,6 +44,8 @@ router.post('/register', (req, res) => {
   users.push(user);
   writeUsers(users);
 
+  const SECRET = getSecret(req);
+
   const token = jwt.sign({ id: user.id, email: user.email }, SECRET, {
     expiresIn: '7d'
   });
@@ -65,6 +70,8 @@ router.post('/login', (req, res) => {
 
   const valid = bcrypt.compareSync(password, user.password);
   if (!valid) return res.status(400).json({ error: 'Credenciales inválidas' });
+
+  const SECRET = getSecret(req);
 
   const token = jwt.sign({ id: user.id, email: user.email }, SECRET, {
     expiresIn: '7d'

@@ -21,12 +21,12 @@ const io = new Server(server, {
   }
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-// Guardamos io en app para usarlo en las rutas
+// Guardamos io y secret en app
 app.set('io', io);
 app.set('jwtSecret', SECRET);
 
@@ -54,7 +54,7 @@ app.use('/api/movements', authMiddleware, movementsRouter);
 app.use('/api/settings', authMiddleware, settingsRouter);
 app.use('/api/savings', authMiddleware, savingsRouter);
 
-// Frontend
+// Frontend estático
 const publicPath = path.join(__dirname, 'public');
 app.use(express.static(publicPath));
 
@@ -64,7 +64,6 @@ app.get('*', (req, res) => {
 
 // Socket.IO: conexión y rooms por usuario
 io.on('connection', socket => {
-  // El cliente manda el token en el handshake
   const token = socket.handshake.auth && socket.handshake.auth.token;
   if (!token) {
     socket.disconnect();
@@ -86,7 +85,7 @@ io.on('connection', socket => {
   }
 });
 
-// Función helper para emitir cambios a un usuario
+// Helper para emitir cambios a un usuario
 function emitUserUpdate(userId) {
   const room = `user-${userId}`;
   io.to(room).emit('dataUpdated');

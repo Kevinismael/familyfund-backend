@@ -1,7 +1,7 @@
 {
   "name": "familyfund-backend",
-  "version": "1.1.0",
-  "description": "Backend para FamilyFund con usuarios y tiempo real",
+  "version": "1.0.0",
+  "description": "FamilyFund con tiempo real estilo WhatsApp",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
