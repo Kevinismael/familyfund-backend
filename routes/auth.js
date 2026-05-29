@@ -5,86 +5,70 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
-const FILE = path.join(__dirname, '..', 'data', 'users.json');
 
-function readUsers() {
-  if (!fs.existsSync(FILE)) fs.writeFileSync(FILE, '[]');
-  return JSON.parse(fs.readFileSync(FILE, 'utf8'));
-}
+// Ruta absoluta al archivo de usuarios
+const usersFile = path.join(__dirname, '..', 'data', 'users.json');
 
-function writeUsers(data) {
-  fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
-}
-
-function getSecret(req) {
-  return req.app.get('jwtSecret') || 'familyfund_super_secreto';
-}
-
-// Registro
-router.post('/register', (req, res) => {
-  const { email, password, familyName } = req.body;
-
-  if (!email || !password || !familyName) {
-    return res.status(400).json({ error: 'Datos incompletos' });
+// Leer usuarios desde archivo
+function loadUsers() {
+  try {
+    const data = fs.readFileSync(usersFile, 'utf8');
+    return JSON.parse(data);
+  } catch (e) {
+    return [];
   }
+}
 
-  const users = readUsers();
-  const exists = users.find(u => u.email === email);
-  if (exists) return res.status(400).json({ error: 'Email ya registrado' });
+// Guardar usuarios en archivo
+function saveUsers(users) {
+  fs.writeFileSync(usersFile, JSON.stringify(users, null, 2));
+}
 
+// Registro de usuario
+router.post('/register', (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password)
+    return res.status(400).json({ error: 'Email y contraseña requeridos' });
+
+  const users = loadUsers();
+
+  // Verificar si ya existe
+  if (users.find(u => u.email === email))
+    return res.status(400).json({ error: 'El email ya está registrado' });
+
+  // Crear usuario
   const hashed = bcrypt.hashSync(password, 10);
-
-  const user = {
+  const newUser = {
     id: Date.now(),
     email,
-    password: hashed,
-    familyName
+    password: hashed
   };
 
-  users.push(user);
-  writeUsers(users);
+  users.push(newUser);
+  saveUsers(users);
 
-  const SECRET = getSecret(req);
-
-  const token = jwt.sign({ id: user.id, email: user.email }, SECRET, {
-    expiresIn: '7d'
-  });
-
-  res.json({
-    token,
-    user: {
-      id: user.id,
-      email: user.email,
-      familyName: user.familyName
-    }
-  });
+  return res.json({ message: 'Usuario registrado correctamente' });
 });
 
 // Login
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
-  const users = readUsers();
+  const users = loadUsers();
   const user = users.find(u => u.email === email);
-  if (!user) return res.status(400).json({ error: 'Credenciales inválidas' });
 
-  const valid = bcrypt.compareSync(password, user.password);
-  if (!valid) return res.status(400).json({ error: 'Credenciales inválidas' });
+  if (!user)
+    return res.status(400).json({ error: 'Usuario no encontrado' });
 
-  const SECRET = getSecret(req);
+  if (!bcrypt.compareSync(password, user.password))
+    return res.status(400).json({ error: 'Contraseña incorrecta' });
 
-  const token = jwt.sign({ id: user.id, email: user.email }, SECRET, {
+  const token = jwt.sign({ id: user.id }, req.app.get('jwtSecret'), {
     expiresIn: '7d'
   });
 
-  res.json({
-    token,
-    user: {
-      id: user.id,
-      email: user.email,
-      familyName: user.familyName
-    }
-  });
+  return res.json({ token });
 });
 
 module.exports = router;
